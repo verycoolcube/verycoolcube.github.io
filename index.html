@@ -12,7 +12,7 @@
         const canvas = document.getElementById('cubeCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Define the 8 vertices (points) of a 3D Cube
+        // Some stuff
         const vertices = [
             {x: -1, y: -1, z: -1}, {x: 1, y: -1, z: -1},
             {x: 1, y: 1, z: -1},  {x: -1, y: 1, z: -1},
@@ -20,58 +20,54 @@
             {x: 1, y: 1, z: 1},   {x: -1, y: 1, z: 1}
         ];
 
-        // Map how vertices connect to form the 12 edges of the cube
+        // map how vertices connect to form the 12 edges of the cube
         const edges = [
             [0, 1], [1, 2], [2, 3], [3, 0], // Back face
             [4, 5], [5, 6], [6, 7], [7, 4], // Front face
             [0, 4], [1, 5], [2, 6], [3, 7]  // Connecting edges
         ];
 
-        // Rotation angles
         let angleX = 0;
         let angleY = 0;
 
         function projectAndDraw() {
-            // Clear the canvas on every frame without using styles
+            // clear the canvas on every frame without using styles
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             const projectedVertices = [];
 
-            // Pre-calculate sines and cosines for the rotation math
+            // pre-calculate sines and cosines for the rotation math
             const radX = angleX * Math.PI / 180;
             const radY = angleY * Math.PI / 180;
             const cosX = Math.cos(radX), sinX = Math.sin(radX);
             const cosY = Math.cos(radY), sinY = Math.sin(radY);
 
-            // Rotate and project each 3D point onto a 2D canvas screen
             for (let i = 0; i < vertices.length; i++) {
                 let p = vertices[i];
 
-                // Scale the cube size
                 let x = p.x * 100;
                 let y = p.y * 100;
                 let z = p.z * 100;
 
-                // Rotate around Y axis
+                // rotate around Y axis
                 let x1 = x * cosY - z * sinY;
                 let z1 = x * sinY + z * cosY;
 
-                // Rotate around X axis
+                // rotate around X axis
                 let y2 = y * cosX - z1 * sinX;
                 let z2 = y * sinX + z1 * cosX;
 
-                // Perspective projection math (Camera distance)
+                // perspective projection math (Camera distance)
                 const distance = 400;
                 const perspective = distance / (distance + z2);
                 
-                // Map coordinates to center of canvas
+                // map coordinates to center of canvas
                 const screenX = canvas.width / 2 + x1 * perspective;
                 const screenY = canvas.height / 2 + y2 * perspective;
 
                 projectedVertices.push({x: screenX, y: screenY});
             }
 
-            // Draw the lines connecting the points
             ctx.lineWidth = 2;
             for (let i = 0; i < edges.length; i++) {
                 const start = projectedVertices[edges[i][0]];
@@ -83,17 +79,17 @@
                 ctx.stroke();
             }
 
-            // Increment rotation values for the next frame
+            // increment rotation values for the next frame
             angleX += 0.2;
             angleY += 0.4;
 
             requestAnimationFrame(projectAndDraw);
         }
 
-        // Initialize animation loop
+        // initialize animation loop
         projectAndDraw();
     </script>
-
+// some nonsense
 <h1 style="font-family: 'Helvetica', 'Arial', sans-serif; font-size: 25px;">
   <a href="https://github.com/verycoolcube/verycoolcube.github.io"
      target="_blank"

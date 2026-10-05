@@ -30,7 +30,6 @@
             margin-bottom: 20px;
         }
 
-        /* Аккуратная текстовая ссылка-кнопка */
         .github-link {
             display: inline-block;
             margin-bottom: 20px;
@@ -104,11 +103,20 @@
         let angleX = 0;
         let angleY = 0;
 
+        // Шанс 1 к 10 (10% вероятности)
+        const isRainbow = Math.random() < 0.1;
+        let hue = 0;
+
         function projectAndDraw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            /* Белые четкие линии куба на темном фоне */
-            ctx.strokeStyle = '#f0f6fc';
+            if (isRainbow) {
+                ctx.strokeStyle = `hsl(${hue}, 100%, 65%)`;
+                hue = (hue + 1.5) % 360;
+            } else {
+                ctx.strokeStyle = '#f0f6fc';
+            }
+
             ctx.lineWidth = 2;
 
             const projectedVertices = [];

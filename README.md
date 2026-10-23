@@ -1,4 +1,5 @@
 # verycoolcube.github.io
+[![Cube](https://img.shields.io/badge/cube-very%20cool-brightgreen)](https://verycoolcube.github.io/)
 
 Hi
 

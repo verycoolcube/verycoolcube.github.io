@@ -3,9 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A simple 3D cube rendered in pure JavaScript without OpenGL or Vulkan.">
+
     <title>Very Cool Cube</title>
-    
+    <meta name="description" content="A simple 3D cube.">
+    <meta name="theme-color" content="#0d1117">
+
+    <!-- Только для поисковиков (Google/Yandex), соцсети не нужны -->
+    <link rel="canonical" href="https://verycoolcube.github.io/">
+    <link rel="icon" href="/favicon.png" type="image/png">
+
     <style>
         * {
             box-sizing: border-box;
@@ -28,6 +34,8 @@
 
         #cubeCanvas {
             margin-bottom: 20px;
+            max-width: 100%;
+            height: auto;
         }
 
         .github-link {
@@ -70,7 +78,9 @@
 </head>
 <body>
 
-    <canvas id="cubeCanvas" width="400" height="400"></canvas>
+    <canvas id="cubeCanvas" width="400" height="400" aria-label="Animated 3D cube rotating in space">
+        Your browser does not support the canvas element.
+    </canvas>
 
     <a class="github-link" href="https://github.com/verycoolcube/verycoolcube.github.io" target="_blank" rel="noopener">
         if you like this site, please star it on github pls
@@ -140,7 +150,7 @@
 
                 const distance = 400;
                 const perspective = distance / (distance + z2);
-                
+
                 const screenX = canvas.width / 2 + x1 * perspective;
                 const screenY = canvas.height / 2 + y2 * perspective;
 

@@ -8,9 +8,15 @@
     <meta name="description" content="A simple 3D cube.">
     <meta name="theme-color" content="#0d1117">
 
-    <!-- Только для поисковиков (Google/Yandex), соцсети не нужны -->
     <link rel="canonical" href="https://verycoolcube.github.io/">
-    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="icon" href="./favicon.png" type="image/png">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Very Cool Cube">
+    <meta property="og:description" content="it's literally just a cube">
+    <meta property="og:url" content="https://verycoolcube.github.io/">
+    <meta property="og:image" content="https://verycoolcube.github.io/favicon.png">
+    <meta name="twitter:card" content="summary">
 
     <style>
         * {
@@ -33,9 +39,11 @@
         }
 
         #cubeCanvas {
-            margin-bottom: 20px;
+            width: 400px;
             max-width: 100%;
             height: auto;
+            display: block;
+            margin-bottom: 20px;
         }
 
         .github-link {
@@ -78,8 +86,8 @@
 </head>
 <body>
 
-    <canvas id="cubeCanvas" width="400" height="400" aria-label="Animated 3D cube rotating in space">
-        Your browser does not support the canvas element.
+    <canvas id="cubeCanvas" role="img" aria-label="Animated 3D cube rotating in space">
+        Your browser does not support the canvas element sorry
     </canvas>
 
     <a class="github-link" href="https://github.com/verycoolcube/verycoolcube.github.io" target="_blank" rel="noopener">
@@ -94,86 +102,155 @@
     <p class="subtext" style="font-size: 0.75rem;">nah, forget it</p>
 
     <script>
-        const canvas = document.getElementById('cubeCanvas');
-        const ctx = canvas.getContext('2d');
+        (() => {
+            const SIZE = 400;
+            const DISTANCE = 400;
+            const CUBE_SCALE = 100;
 
-        const vertices = [
-            {x: -1, y: -1, z: -1}, {x: 1, y: -1, z: -1},
-            {x: 1, y: 1, z: -1},  {x: -1, y: 1, z: -1},
-            {x: -1, y: -1, z: 1},  {x: 1, y: -1, z: 1},
-            {x: 1, y: 1, z: 1},   {x: -1, y: 1, z: 1}
-        ];
+            // Если захочешь эффект глубины — поставь true.
+            // По умолчанию выключен: все рёбра одинаковые и ровные.
+            const USE_DEPTH = false;
+            const DEPTH_RANGE = 180; // макс |z| после поворотов
 
-        const edges = [
-            [0, 1], [1, 2], [2, 3], [3, 0],
-            [4, 5], [5, 6], [6, 7], [7, 4],
-            [0, 4], [1, 5], [2, 6], [3, 7]
-        ];
+            const reduceMotion =
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        let angleX = 0;
-        let angleY = 0;
+            const canvas = document.getElementById('cubeCanvas');
+            const ctx = canvas.getContext('2d');
 
-        // Шанс 1 к 10 (10% вероятности)
-        const isRainbow = Math.random() < 0.1;
-        let hue = 0;
+            // Retina fix
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width  = SIZE * dpr;
+            canvas.height = SIZE * dpr;
+            ctx.scale(dpr, dpr);
 
-        function projectAndDraw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const vertices = [
+                {x: -1, y: -1, z: -1}, {x: 1, y: -1, z: -1},
+                {x: 1, y: 1, z: -1},  {x: -1, y: 1, z: -1},
+                {x: -1, y: -1, z: 1},  {x: 1, y: -1, z: 1},
+                {x: 1, y: 1, z: 1},   {x: -1, y: 1, z: 1}
+            ];
 
-            if (isRainbow) {
-                ctx.strokeStyle = `hsl(${hue}, 100%, 65%)`;
-                hue = (hue + 1.5) % 360;
-            } else {
-                ctx.strokeStyle = '#f0f6fc';
+            const edges = [
+                [0, 1], [1, 2], [2, 3], [3, 0],
+                [4, 5], [5, 6], [6, 7], [7, 4],
+                [0, 4], [1, 5], [2, 6], [3, 7]
+            ];
+
+            let angleX = 0;
+            let angleY = 0;
+
+            const isRainbow = Math.random() < 0.1;
+            let hue = Math.random() * 360;
+
+            let rafId = null;
+
+            function draw() {
+                ctx.clearRect(0, 0, SIZE, SIZE);
+
+                if (isRainbow) {
+                    ctx.strokeStyle = `hsl(${hue.toFixed(1)}, 100%, 65%)`;
+                    hue = (hue + 1.5) % 360;
+                } else {
+                    ctx.strokeStyle = '#f0f6fc';
+                }
+
+                const radX = angleX * Math.PI / 180;
+                const radY = angleY * Math.PI / 180;
+                const cosX = Math.cos(radX), sinX = Math.sin(radX);
+                const cosY = Math.cos(radY), sinY = Math.sin(radY);
+
+                const projected = new Array(vertices.length);
+                const zValues   = new Array(vertices.length);
+
+                for (let i = 0; i < vertices.length; i++) {
+                    const p = vertices[i];
+                    const x = p.x * CUBE_SCALE;
+                    const y = p.y * CUBE_SCALE;
+                    const z = p.z * CUBE_SCALE;
+
+                    const x1 = x * cosY - z * sinY;
+                    const z1 = x * sinY + z * cosY;
+
+                    const y2 = y * cosX - z1 * sinX;
+                    const z2 = y * sinX + z1 * cosX;
+
+                    const perspective = DISTANCE / (DISTANCE + z2);
+                    projected[i] = {
+                        x: SIZE / 2 + x1 * perspective,
+                        y: SIZE / 2 + y2 * perspective
+                    };
+                    zValues[i] = z2;
+                }
+
+                if (USE_DEPTH) {
+                    // Дальние рёбра бледнее, ближние ярче.
+                    // lineCap='butt' — чтобы на стыках не было «шишечек».
+                    ctx.lineCap = 'butt';
+
+                    const sorted = edges
+                        .map(e => ({ e, z: (zValues[e[0]] + zValues[e[1]]) * 0.5 }))
+                        .sort((a, b) => b.z - a.z);
+
+                    for (const { e, z } of sorted) {
+                        const t = Math.max(
+                            0,
+                            Math.min(1, (z + DEPTH_RANGE) / (2 * DEPTH_RANGE))
+                        );
+
+                        ctx.globalAlpha = 0.35 + (1 - t) * 0.65; // 1.0 → 0.35
+                        ctx.lineWidth   = 2;
+
+                        const a = projected[e[0]];
+                        const b = projected[e[1]];
+
+                        ctx.beginPath();
+                        ctx.moveTo(a.x, a.y);
+                        ctx.lineTo(b.x, b.y);
+                        ctx.stroke();
+                    }
+
+                    ctx.globalAlpha = 1;
+                } else {
+                    // Чистый вариант: все рёбра одним путём, одинаковый стиль.
+                    ctx.lineCap = 'round';
+                    ctx.lineWidth = 2;
+
+                    ctx.beginPath();
+                    for (const [a, b] of edges) {
+                        ctx.moveTo(projected[a].x, projected[a].y);
+                        ctx.lineTo(projected[b].x, projected[b].y);
+                    }
+                    ctx.stroke();
+                }
+
+                if (!reduceMotion) {
+                    angleX += 0.2;
+                    angleY += 0.4;
+                }
             }
 
-            ctx.lineWidth = 2;
-
-            const projectedVertices = [];
-            const radX = angleX * Math.PI / 180;
-            const radY = angleY * Math.PI / 180;
-            const cosX = Math.cos(radX), sinX = Math.sin(radX);
-            const cosY = Math.cos(radY), sinY = Math.sin(radY);
-
-            for (let i = 0; i < vertices.length; i++) {
-                let p = vertices[i];
-
-                let x = p.x * 100;
-                let y = p.y * 100;
-                let z = p.z * 100;
-
-                let x1 = x * cosY - z * sinY;
-                let z1 = x * sinY + z * cosY;
-
-                let y2 = y * cosX - z1 * sinX;
-                let z2 = y * sinX + z1 * cosX;
-
-                const distance = 400;
-                const perspective = distance / (distance + z2);
-
-                const screenX = canvas.width / 2 + x1 * perspective;
-                const screenY = canvas.height / 2 + y2 * perspective;
-
-                projectedVertices.push({x: screenX, y: screenY});
+            function loop() {
+                draw();
+                if (reduceMotion) return;
+                rafId = requestAnimationFrame(loop);
             }
 
-            for (let i = 0; i < edges.length; i++) {
-                const start = projectedVertices[edges[i][0]];
-                const end = projectedVertices[edges[i][1]];
+            document.addEventListener('visibilitychange', () => {
+                if (reduceMotion) return;
 
-                ctx.beginPath();
-                ctx.moveTo(start.x, start.y);
-                ctx.lineTo(end.x, end.y);
-                ctx.stroke();
-            }
+                if (document.hidden) {
+                    if (rafId !== null) {
+                        cancelAnimationFrame(rafId);
+                        rafId = null;
+                    }
+                } else if (rafId === null) {
+                    loop();
+                }
+            });
 
-            angleX += 0.2;
-            angleY += 0.4;
-
-            requestAnimationFrame(projectAndDraw);
-        }
-
-        projectAndDraw();
+            loop();
+        })();
     </script>
 </body>
 </html>

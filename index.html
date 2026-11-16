@@ -25,6 +25,8 @@
             padding: 0;
         }
 
+        /* okay okay you got it, code is qweqwe */
+
         body {
             background-color: #0d1117;
             color: #c9d1d9;
@@ -36,6 +38,8 @@
             min-height: 100vh;
             padding: 20px;
             text-align: center;
+            
+            --sys-init: 1;
         }
 
         #cubeCanvas {
@@ -127,6 +131,8 @@
 </head>
 <body>
 
+    <!-- TODO: check keyboard sequence integrity -->
+
     <canvas id="cubeCanvas" role="img" aria-label="Animated 3D cube rotating in space">
         Your browser does not support the canvas element, sorry
     </canvas>
@@ -153,7 +159,6 @@
 
     <script>
         (() => {
-            // hi
             console.log("%cLooking for the source code? It's literally just a cube, no deep meaning here. (nice try though)", "color: #58a6ff; font-size: 14px; font-family: sans-serif;");
 
             const SIZE = 400;
@@ -188,27 +193,148 @@
 
             const isRainbow = Math.random() < 0.1;
             let hue = Math.random() * 360;
-
+            // second part of the decoder
             let rafId = null;
 
-            let mode = 'cube'; 
+            let mode = 'cube';
             let fragments = [];
             let triangleAngle = 0;
+            // end
             
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            // hi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             // definitely not the secret code obfuscated via base64
-            const _0xSecret = 'cXl3dGVy'; 
-            
+            const _0xSecret = 'cXl3dGVyIHwgfCBZb3UgZm91bmQgdGhlIHNlY3JldC4gQnV0IHdhaXQsIHlvdSBhY3R1YWxseSBkZWNvZGVkIHRoaXM/IEkgbWVhbiwgeW91IGNvdWxkIGhhdmUganVzdCB0eXBlZCBpdC4gSSBndWVzcyBJIHJlc3BlY3QgdGhlIGVmZm9ydC4gQnV0IGNvbWUgb24sIGl0J3MgbGl0ZXJhbGx5IGp1c3QgYSBjdWJlLiBEaWQgeW91IHJlYWxseSB0aGluayB0aGVyZSB3YXMgYSBoaWRkZW4gbWVzc2FnZT8gV2VsbCwgdGhlcmUgaXMgbm93LiBHbyB0b3VjaCBzb21lIGdyYXNzIG9yIHNvbWV0aGluZy4gKGxvbCk='; 
+
             // not useless
-            const uselessArray1 = ['w', 'e', 'r', 't', 'y']; 
+            const uselessArray1 = ['w', 'e', 'r', 't', 'y'];
             const uselessArray2 = ['a', 'b', 'c'];
+            let _0xInit = false;
+            let _0xHash = 0xDEADBEEF;
+
+            let _0xKeys = ["cXl3dGVy", "dHJpYW5nbGU=", "Y3ViZQ=="];
 
             let typedSequence = [];
+
+            function _0xCrypt(input, key) {
+                let output = "";
+                for (let i = 0; i < input.length; i++) {
+                    output += String.fromCharCode(input.charCodeAt(i) ^ key);
+                }
+                return output;
+            }
+
+            function _0xValidateEnv() {
+                const checks = [
+                    typeof window !== 'undefined',
+                    typeof document !== 'undefined',
+                    _0xHash !== 0,
+                    _0xKeys.length === 3
+                ];
+                return checks.every(c => c === true);
+            }
+
+            
+            function _0xDecrypt(str) {
+                try {
+                    const decoded = atob(str);
+                    if (decoded.includes(' | | ')) {
+                        return decoded.split(' | | ')[0];
+                    }
+                    return decoded.substring(0, 6); 
+                } catch(e) {
+                    return '';
+                }
+            }
+
+            function _0xInitCore() {
+                if (_0xInit) return;
+                _0xInit = true;
+                _0xHash = (_0xHash ^ 0xCAFEBABE) >>> 0;
+                
+                for (let i = 0; i < uselessArray1.length; i++) {
+                    _0xHash += uselessArray1[i].charCodeAt(0);
+                }
+                _0xHash = _0xHash % 0xFFFF;
+
+                // debug log that looks like gibberish
+                // 113 121 119 116 101 114 => q y w t e r
+                console.log("SysCheck: " + [113, 121, 119, 116, 101, 114].join(' '));
+            }
+
+            function _0xCheckSequence() {
+                return typedSequence.join('').toLowerCase(); 
+            }
+
+            _0xInitCore();
 
             function getColors() {
                 if (isRainbow) {
                     return `hsl(${hue.toFixed(1)}, 100%, 65%)`;
                 }
                 return '#f0f6fc';
+            }
+
+            function playSynthSound() {
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    const audioCtx = new AudioContext();
+
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+
+                    oscillator.type = 'sawtooth';
+                    
+                    const now = audioCtx.currentTime;
+                    
+                    oscillator.frequency.setValueAtTime(300, now);
+                    oscillator.frequency.exponentialRampToValueAtTime(800, now + 0.1); 
+                    oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.5); 
+
+                    gainNode.gain.setValueAtTime(0.5, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.5);
+                } catch (e) {
+                    console.warn("damn", e);
+                }
             }
 
             function projectCube() {
@@ -218,7 +344,6 @@
                 const cosY = Math.cos(radY), sinY = Math.sin(radY);
 
                 const projected = [];
-                // this function makes _0xSecret readable
                 for (let i = 0; i < vertices.length; i++) {
                     const p = vertices[i];
                     const x = p.x * CUBE_SCALE;
@@ -242,30 +367,29 @@
             function createExplosion(projected) {
                 fragments = [];
                 const color = getColors();
-                // eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
                 for (const [a, b] of edges) {
                     const p1 = projected[a];
                     const p2 = projected[b];
                     const segmentsCount = 4;
-                    
+
                     for (let i = 0; i < segmentsCount; i++) {
                         const t1 = i / segmentsCount;
                         const t2 = (i + 1) / segmentsCount;
-                        
+
                         const x1 = p1.x + (p2.x - p1.x) * t1;
                         const y1 = p1.y + (p2.y - p1.y) * t1;
                         const x2 = p1.x + (p2.x - p1.x) * t2;
                         const y2 = p1.y + (p2.y - p1.y) * t2;
-                        
+
                         const cx = (x1 + x2) / 2;
                         const cy = (y1 + y2) / 2;
                         const len = Math.hypot(x2 - x1, y2 - y1);
                         const angle = Math.atan2(y2 - y1, x2 - x1);
-                        
+
                         const dx = cx - SIZE / 2;
                         const dy = cy - SIZE / 2;
                         const dist = Math.hypot(dx, dy) || 1;
-                        
+
                         fragments.push({
                             x: cx, y: cy,
                             vx: (dx / dist) * (Math.random() * 8 + 3),
@@ -281,9 +405,15 @@
             }
 
             function triggerEasterEgg() {
+                if (!_0xValidateEnv()) return;
                 if (mode !== 'cube') return;
-                mode = 'explode';
                 
+                mode = 'explode';
+
+                console.log("%cYou found it! The secret is... just a cube. Nothing else.", "color: #58a6ff; font-size: 16px; font-weight: bold;");
+
+                playSynthSound();
+
                 document.getElementById('github-btn').innerText = 'hi';
                 document.getElementById('title').innerText = 'hi';
                 document.querySelectorAll('p').forEach(p => p.innerText = 'hi');
@@ -322,6 +452,7 @@
                         angleY += 0.4;
                     }
                 } 
+                // decoder
                 else if (mode === 'explode') {
                     for (let i = fragments.length - 1; i >= 0; i--) {
                         const f = fragments[i];
@@ -398,7 +529,7 @@
                     typedSequence.shift();
                 }
 
-                if (btoa(typedSequence.join('')) === _0xSecret) {
+                if (_0xDecrypt(_0xSecret) === _0xCheckSequence()) {
                     triggerEasterEgg();
                 }
             }
